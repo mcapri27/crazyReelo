@@ -265,13 +265,60 @@ function BentoEffects() {
     const pointEffects = () => {
         const bioSection = document.querySelector('.open--section');
         const pointDiv = document.querySelector('.section--two > *:nth-child(2)');
+        const img1 = document.querySelector('.section--two > *:nth-child(1) > *:nth-child(1) img');
+        const par1 = document.querySelector('.section--two > *:nth-child(1) > *:nth-child(2) p');
+        const img2 = document.querySelector('.section--two > *:nth-child(3) > *:nth-child(1) img');
+        const par2 = document.querySelector('.section--two > *:nth-child(3) > *:nth-child(2) p');
         const article1 = document.querySelector('.section--two > *:nth-child(1)');
         const article2 = document.querySelector('.section--two > *:nth-child(3)');
         const windowHeight = window.innerHeight; 
         const sectionTop = bioSection.getBoundingClientRect().top;
         const sectionBottom = bioSection.getBoundingClientRect().bottom;
     
-        if (window.innerWidth > 786) {
+        if (window.innerWidth < 1024) {
+            // Elements to animate with their individual offsets
+            const elementsToAnimate = [
+                { el: pointDiv, offset: 0 },
+                { el: img1, offset: 100 },
+                { el: par1, offset: 200 },
+                { el: img2, offset: 300 },
+                { el: par2, offset: 400 }
+            ];
+
+            // Function to check if an individual element is in viewport
+            const isElementInView = (el, offset = 0) => {
+                if (!el) return false;
+                const rect = el.getBoundingClientRect();
+                return (
+                    rect.top <= (window.innerHeight - offset) &&
+                    rect.bottom >= offset
+                );
+            };
+
+            // Process each element independently
+            elementsToAnimate.forEach(({ el, offset }) => {
+                if (!el) return;
+                
+                // Initialize styles if not already set
+                if (el.style.opacity === '') {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(10vh)';
+                    el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                }
+                
+                // Check if this specific element is in view
+                if (isElementInView(el, 100)) { // 100px offset from top/bottom
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                } else if (window.scrollY < bioSection.offsetTop) {
+                    // Only reset if we're above the section (optional)
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(10vh)';
+                }
+            });
+        }
+
+        else if (window.innerWidth > 1024) {
             if (sectionTop < windowHeight * -0.15 && sectionBottom > windowHeight * -0.15) { 
                 pointDiv.style.transform = 'translateY(0)';
                 pointDiv.style.opacity = '1';
@@ -463,8 +510,4 @@ window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
         runAllAnimations();
     }
-});
-
-document.getElementById("backToSite").addEventListener("click", function() {
-    window.location.href = "index.html";
 });
